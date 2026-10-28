@@ -1,0 +1,28 @@
+# このファイルはひな形です。利用時は config.toml にコピーして編集します。
+# 設定画面は当面作らず、TOML を直接編集します。
+#
+# 設定の探索順（最初に見つかったファイルを丸ごと採用、マージしない）:
+# 1. bunrui-kun.app と同じディレクトリの config.toml
+#    単体実行ファイルで配布する場合は、その実行ファイルの横。
+#    .app の Contents/MacOS 内には置きません。
+# 2. ユーザーの Application Support / bunrui-kun / config.toml
+#    通常: ~/Library/Application Support/bunrui-kun/config.toml
+# カレントディレクトリは探索しません。
+# 見つかった設定が不正・読めない場合はエラーにし、次候補へは進みません。
+# 設定がどちらにもない場合も、設定先を示してエラーにします。
+#
+# app は apps 内のキーを参照します。ルールは上から評価し、最初の一致を採用。
+# pattern は入力 URL 全体への正規表現検索。最後の .* が既定の行き先です。
+# 未定義の app、不正な正規表現、空の rules は設定エラーです。
+# 一致なしもエラーにし、OS の既定ブラウザへは戻しません（再帰防止）。
+#
+# bundle_id で対象アプリを指定し、OS の API で URL を渡します。
+# args はこの形式では使いません。Windows の path + args と排他的です。
+# 正規表現には、バックスラッシュを保持する単一引用符が便利です。
+
+[apps.chrome]
+bundle_id = 'com.google.Chrome'
+
+[[rules]]
+pattern = '.*'
+app = 'chrome'

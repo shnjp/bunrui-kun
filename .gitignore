@@ -1,0 +1,4 @@
+windows/.tools/
+windows/build/
+windows/out/
+config.toml

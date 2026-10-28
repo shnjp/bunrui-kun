@@ -1,0 +1,60 @@
+# このファイルはひな形です。利用時は config.toml にコピーして編集します。
+# 設定画面は当面作らず、TOML を直接編集します。
+#
+# 設定の探索順（最初に見つかったファイルを丸ごと採用、マージしない）:
+# 1. bunrui-kun.exe と同じディレクトリの config.toml
+# 2. FOLDERID_LocalAppData / bunrui-kun / config.toml
+#    通常: %LOCALAPPDATA%\bunrui-kun\config.toml
+# アプリのパスなど端末固有の設定を含むため LocalAppData を使用します。
+# カレントディレクトリは探索しません。
+# 見つかった設定が不正・読めない場合はエラーにし、次候補へは進みません。
+# 設定がどちらにもない場合も、設定先を示してエラーにします。
+#
+# app は apps 内のキーを参照します。ルールは上から評価し、最初の一致を採用。
+# pattern は入力 URL 全体への正規表現検索。最後の .* が既定の行き先です。
+# 未定義の app、不正な正規表現、空の rules は設定エラーです。
+# 一致なしもエラーにし、OS の既定ブラウザへは戻しません（再帰防止）。
+#
+# path はアプリの実行ファイル。相対パスは採用した設定ファイルを基準に解決。
+# args は個別の引数。{url} を入力 URL に置換し、シェルを介さず起動します。
+# パス内の環境変数や ~ の展開は行いません。実際のインストール先に合わせてください。
+# 正規表現と Windows パスには、バックスラッシュを保持する単一引用符が便利です。
+# uri は path + args の代わりに指定するカスタムURIです（http/https は不可）。
+# args と uri では {url} が元URL、{1}, {2}, ... が正規表現のキャプチャです。
+# キャプチャはそのまま挿入します。必要なURLエンコードは設定側で考慮してください。
+# 正規表現は C++ ECMAScript、UTF-8バイト列に対する検索、大文字小文字を区別します。
+
+[apps.chrome]
+path = 'C:\Program Files\Google\Chrome\Application\chrome.exe'
+args = ['{url}']
+
+# 同じ実行ファイルを、別のプロファイル向けアプリとして定義できます。
+[apps.work]
+path = 'C:\Program Files\Google\Chrome\Application\chrome.exe'
+args = ['--profile-directory=Profile 1', '{url}']
+
+[apps.slack]
+uri = 'slack://channel?team={1}&id={2}'
+
+[apps.notion]
+uri = 'notion://{1}'
+
+# ワークスペースとチャンネルのIDがURLに含まれるリンクだけを対象とします。
+# メッセージリンクやワークスペース名だけのリンクはChromeへ渡します。
+[[rules]]
+pattern = '^https://app\.slack\.com/client/(T[A-Z0-9]+)/(C[A-Z0-9]+)/?(?:[?#].*)?$'
+app = 'slack'
+
+# notion.so のページIDを含むリンク。ログイン画面や公開サイトはChromeへ。
+# notion:// の処理にはNotionデスクトップアプリが必要です。
+[[rules]]
+pattern = '^https://((?:[A-Za-z0-9-]+\.)?notion\.so/[^?#]*[0-9a-fA-F]{32}(?:[/?#].*)?)$'
+app = 'notion'
+
+[[rules]]
+pattern = '^https://work\.example\.com([/:?#]|$)'
+app = 'work'
+
+[[rules]]
+pattern = '.*'
+app = 'chrome'
